@@ -10,6 +10,7 @@ load_dotenv()
 DEFAULT_MODEL = os.getenv("OPENROUTER_MODEL", "google/gemini-3-flash-preview")
 BASE_URL = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
 API_KEY = os.getenv("OPENROUTER_API_KEY", "")
+MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", "4096"))
 
 
 def get_client() -> OpenAI:
@@ -23,7 +24,7 @@ def chat(
     messages: list[dict],
     model: str | None = None,
     temperature: float = 0.7,
-    max_tokens: int = 4096,
+    max_tokens: int | None = None,
 ) -> str:
     """发送聊天请求，返回回复文本。
 
@@ -36,16 +37,19 @@ def chat(
         model=model or DEFAULT_MODEL,
         messages=messages,
         temperature=temperature,
-        max_tokens=max_tokens,
+        max_tokens=max_tokens or MAX_TOKENS,
     )
-    return response.choices[0].message.content
+    content = response.choices[0].message.content
+    if content is None:
+        raise ValueError("LLM returned None content")
+    return content
 
 
 def chat_stream(
     messages: list[dict],
     model: str | None = None,
     temperature: float = 0.7,
-    max_tokens: int = 4096,
+    max_tokens: int | None = None,
 ):
     """流式聊天，yield 每个文本片段。"""
     client = get_client()
@@ -53,7 +57,7 @@ def chat_stream(
         model=model or DEFAULT_MODEL,
         messages=messages,
         temperature=temperature,
-        max_tokens=max_tokens,
+        max_tokens=max_tokens or MAX_TOKENS,
         stream=True,
     )
     for chunk in stream:

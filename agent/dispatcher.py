@@ -1,6 +1,6 @@
 """Skill 调度器 — 根据用户意图分发到对应工具函数"""
 
-from tools import reader, writer, formatter, analyzer
+from tools import reader, writer, formatter, analyzer, code_executor
 
 
 # 注册可用的工具函数
@@ -59,6 +59,11 @@ TOOL_REGISTRY = {
         "fn": analyzer.create_chart,
         "description": "生成图表",
         "params": ["file_path", "sheet_name", "chart_type", "x_col", "y_col", "output_path"],
+    },
+    "run_python": {
+        "fn": code_executor.run_python,
+        "description": "执行Python代码（可用openpyxl/pandas/numpy），用于复杂操作",
+        "params": ["code", "timeout"],
     },
 }
 
