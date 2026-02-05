@@ -7,3 +7,4 @@ dist/
 build/
 .pytest_cache/
 examples/demo_output*
+SpreadsheetBench-NoDocker/

@@ -10,10 +10,12 @@ dependencies = [
     "Pillow>=10.0",
     "matplotlib>=3.7",
     "python-dotenv>=1.0",
+    "tqdm>=4.60",
 ]
 
 [project.optional-dependencies]
 dev = ["pytest>=7.0", "pytest-asyncio>=0.21"]
+office = ["defusedxml>=0.7", "lxml>=4.9"]
 
 [tool.setuptools.packages.find]
 include = ["agent*", "llm*", "tools*"]

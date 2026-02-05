@@ -1,6 +1,7 @@
 """ExcelAgent 核心 — 智能体主循环"""
 
 import json
+import os
 import re
 import time
 
@@ -41,6 +42,18 @@ def parse_tool_call(text: str) -> dict | None:
         return json.loads(match.group(1))
     except json.JSONDecodeError:
         return None
+
+
+def load_xlsx_skill() -> str:
+    """加载完整的 xlsx SKILL.md 内容。"""
+    skill_path = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        "skills",
+        "xlsx",
+        "SKILL.md"
+    )
+    with open(skill_path, "r", encoding="utf-8") as f:
+        return f.read()
 
 
 def run(user_input: str, file_path: str | None = None, max_steps: int = 10, model: str | None = None) -> str:
@@ -108,6 +121,10 @@ You manipulate Excel files by calling tools. You will receive a spreadsheet mani
 
 {tools}
 
+# xlsx SKILL - Professional Excel Guidelines
+
+{xlsx_skill}
+
 ## Call Format
 
 When you need to use a tool, output the following JSON block:
@@ -115,7 +132,7 @@ When you need to use a tool, output the following JSON block:
 {{"tool": "tool_name", "args": {{"param": "value"}}}}
 ```
 
-## Rules
+## Additional Benchmark Rules
 1. Read the file first to understand its structure (use read_excel or get_summary).
 2. Use Excel formulas when appropriate (write them as strings starting with =).
 3. Focus on writing correct values/formulas to the answer_position cells.
@@ -171,7 +188,10 @@ def run_benchmark(
     Returns:
         (final_response, full_messages) 元组
     """
-    system = BENCHMARK_SYSTEM_PROMPT.format(tools=get_tools_description())
+    system = BENCHMARK_SYSTEM_PROMPT.format(
+        tools=get_tools_description(),
+        xlsx_skill=load_xlsx_skill()
+    )
     messages: list[dict] = [{"role": "system", "content": system}]
 
     user_content = (

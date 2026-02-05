@@ -145,9 +145,7 @@ def run_single_task(
             "output_exists": os.path.exists(output_path),
             "elapsed_seconds": elapsed,
         }
-        result["conversation"] = [
-            {"role": m["role"], "content": m["content"][:2000]} for m in messages
-        ]
+        result["conversation"] = messages
         result["tool_calls"] = tool_calls
         result["num_steps"] = len(tool_calls)
 
